@@ -1,7 +1,9 @@
 #ifndef GET_CLUSTER_H
 #define GET_CLUSTER_H
-#include "reflectance-cluster.h"
-#include "queue"
+#include "cv.h"
+#include <opencv2/opencv.hpp>
+#include "segment-image.h"
+#include <queue>
 using namespace std;
 using namespace cv;
 /*
@@ -23,10 +25,8 @@ void GetReflectanceCluster(const Mat_<Vec3d>& im,
                            int *num_ccs, 
                            Mat_<Vec3b>& output,
                            Mat_<int>& pixel_label,
-                           vector<ReflectanceCluster>& clusters,
                            int expected_cluster_num,
-                           const Mat_<int>& region,
-                           const Mat_<int>& mask) {
+                           const Mat_<int>& region) {
     int width = im.cols;
     int height = im.rows;
 
@@ -56,9 +56,6 @@ void GetReflectanceCluster(const Mat_<Vec3d>& im,
     int vertex_num = 0;
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            if (mask(y, x) == 0){
-                continue;
-            }
             vertex_num++;
 
             if (x < width - 1) {
@@ -95,8 +92,6 @@ void GetReflectanceCluster(const Mat_<Vec3d>& im,
     delete smooth_b;
     
     // restrict the maximum number of pixels in a cluster
-    // double expected_cluster_num = 2500;
-    // int max_pixel_number = (width * height) / (double)expected_cluster_num + 20;
     int max_pixel_number = vertex_num / (double)expected_cluster_num + 20;
 
     // segment
@@ -117,25 +112,16 @@ void GetReflectanceCluster(const Mat_<Vec3d>& im,
     int count = 1;
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            if (mask(y, x) == 0){
-                pixel_label(y, x) = 0;
-                continue;
-            }
-
             int comp = u->find(y * width + x);
             if (index.count(comp) > 0){
                 int temp = index[comp];
-                // clusters[temp].AddPixel(Point2i(y, x));
                 pixel_label(y, x) = temp;
             }
             else{
                 index[comp] = count;
                 pixel_label(y, x) = count;
                 count++;
-                // ReflectanceCluster new_cluster;
-                // new_cluster.AddPixel(Point2i(y, x));
-                // clusters.push_back(new_cluster);
-            }
+			}
         }
     }
 

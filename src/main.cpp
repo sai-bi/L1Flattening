@@ -1,8 +1,5 @@
-#include "mat-image-convert.h"
 #include "get-cluster.h"
-#include "optimization.h"
-#include "shading.h"
-#include "get-region.h"
+#include <fstream>
 using namespace cv;
 using namespace std;
 
@@ -75,44 +72,17 @@ int main(int argc, char* argv[]){
     int cluster_num = 0;
     Mat_<Vec3b> output;
     Mat_<int> label;
-    vector<ReflectanceCluster> clusters;
+    // vector<ReflectanceCluster> clusters;
 
     cout << "Segment the image..." << endl;
     GetReflectanceCluster(project_image, sigma, c, min_size, &cluster_num,
-            output, label, clusters, expected_cluster_num, region, mask);
+            output, label, expected_cluster_num, region);
     cout << "Super-pixel num: " << cluster_num << endl;
 
+	
     ofstream fout;
     fout.open(output_path);
-    fout << format(label, "csv") << endl;
-    fout.close();
+    fout << cv::format(label, cv::Formatter::FMT_CSV) << endl;
+	
     return 0;
-    
-    /*
-    cout << "Number of clusters: " << cluster_num << endl;
-    imshow("cluster result", output);
-    waitKey(0);
-
-    double alpha = 600.0;
-    double beta = 0.01;
-    double theta = 20.0;
-    double lambda = 40.0;
-    
-    cout << "Solve reflectance..." << endl;
-    Mat_<double> solved_r;
-	SolveReflectance(clusters, image, label, alpha, beta, theta, lambda, region, solved_r);
-    return 0;
-    */
-    /*
-    for(int i = 0; i < image_height; ++i){
-    for(int j = 0; j < image_width; ++j){
-    double r = image(i,j)[2];
-    double g = image(i,j)[1];
-    double b = image(i,j)[0];
-    project_image(i,j)[0] = 0.2 * (r + g + b) / 3;
-    project_image(i,j)[1] = r / (r + g + b);
-    project_image(i,j)[2] = g / (r + g + b);
-    }
-    }
-    */
 }

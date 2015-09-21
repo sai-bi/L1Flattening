@@ -5,6 +5,7 @@
 #include <list>
 #include <stack>
 #include <vector>
+#include <fstream>
 #define VALID(x, y, w, h, r) (x >= 0 && y >= 0 && x < h && y < w && r(x,y) < 0) 
 using namespace std;
 using namespace cv;
@@ -71,10 +72,12 @@ Mat_<int> GetRegion(string region_map_path){
     }
     imshow("Region", region_image);
 
+	/*
     ofstream fout;
     fout.open("region.txt");
     fout << format(region, "csv");
     fout.close();
+	*/
     return region;
 }
 

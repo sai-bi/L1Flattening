@@ -28,7 +28,7 @@ image<rgb>* MatToImage(const Mat_<Vec3b>& input){
 }
 
 /*
-* Given an image stored in image<rgb>, turn it into Mat_<Vec3b>.
+ * Given an image stored in image<rgb>, turn it into Mat_<Vec3b>.
 */
 Mat_<Vec3b> ImageToMat(const image<rgb>& input){
     int height = input.height();
