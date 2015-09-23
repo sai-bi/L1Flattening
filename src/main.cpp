@@ -1,5 +1,5 @@
-#include "get-cluster.h"
 #include <fstream>
+#include "get-cluster.h"
 using namespace cv;
 using namespace std;
 
@@ -72,7 +72,6 @@ int main(int argc, char* argv[]){
     int cluster_num = 0;
     Mat_<Vec3b> output;
     Mat_<int> label;
-    // vector<ReflectanceCluster> clusters;
 
     cout << "Segment the image..." << endl;
     GetReflectanceCluster(project_image, sigma, c, min_size, &cluster_num,
