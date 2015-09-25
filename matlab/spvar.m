@@ -1,4 +1,4 @@
-function [M] = spvariation(image, label)
+function [M] = spvar(image, label)
 % [M] = spvariation(image)
 % Usage:
 %   - For each superpixel, get a pixel that is closet to it in color
@@ -9,15 +9,10 @@ function [M] = spvariation(image, label)
 % Output:
 %   - M: generated matrix (sparse)
 image = double(image);
-width = size(image, 2);
-height = size(image, 1);
-pixel_num = height * width;
+width = size(image, 2); height = size(image, 1); pixel_num = height * width;
 
-% super-pixel number
 sp_num = length(unique(label));
-r = image(:,:,1);
-g = image(:,:,2);
-b = image(:,:,3);
+r = image(:,:,1); g = image(:,:,2); b = image(:,:,3);
 rep_index = zeros(sp_num, 1);
 
 % find the average color of each super-pixel
@@ -31,29 +26,11 @@ for i = 1 : sp_num
     rep_index(i) = index(min_index);
 end
 
-
-pair_num = (sp_num * (sp_num - 1)) / 2;
-row = zeros(2 * pair_num, 1);
-col = zeros(2 * pair_num, 1);
-val = zeros(2 * pair_num, 1);
-
-count = 1;
-row_count= 1;
-for i = 1 : sp_num
-    for j = i + 1 : sp_num
-        row(count) = row_count;
-        col(count) = rep_index(i);
-        val(count) = 1;
-        count = count + 1;
-
-        row(count) = row_count;
-        col(count) = rep_index(j);
-        val(count) = -1;
-        count = count + 1;
-
-        row_count = row_count + 1;
-    end
-end
+pair = nchoosek(rep_index, 2);
+temp_1 = pair(:,1)'; temp_2 = pair(:,2)'; pair_num = length(temp_1);
+row = [1:pair_num 1:pair_num];
+col = [temp_1 temp_2];
+val = [ones(1, pair_num) -1 * ones(1,pair_num)];
 
 row_1 = row + length(row) / 2;
 col_1 = col + pixel_num;

@@ -4,32 +4,15 @@ function [ref_image] = l1smoothing(image, splabel, param)
 % Input:
 %   - image: input image
 %   - splabel: super-pixel label for each pixel
-%   - param: parameters, alpha, beta, theta, lambda
+%   - param:
+%       .alpha       [20] local sparseness weight
+%       .beta        [0.01] global sparseness weight
+%       .theta       [50] image approximation term
+%       .lambda      [120] regularization term weight
+%       .itr_num     [4] number of iterations in optimization
+%       .window_size [5] size of local sparseness windows
 % Output:
 %   - ref_image: output image after smoothing
-
-width = size(image, 2);
-height = size(image, 1);
-pixel_num = width * height;
-image = double(image);
-r = image(:,:,1); r = r(:);
-g = image(:,:,2); g = g(:);
-b = image(:,:,3); b = b(:);
-
-% construct first term matrix: local sparse
-fprintf('Construct local sparse matrix...\n');
-if ~exist('ori_A', 'var')
-    window_size = 5;
-    ori_A = windowvariation(image, window_size, param);
-end
-
-% construct second term matrix: global sparse
-fprintf('Construct global sparse matrix...\n');
-B = spvariation(image, splabel);
-target = [r; g; b];
-
-% alpha = 20; beta = 0.01; theta = 50; lambda = 120;
-% check parameters
 if isfield(param, 'alpha')
     alpha = param.alpha;
 else
@@ -54,8 +37,22 @@ else
     lambda = 120;
 end
 
-A = alpha * ori_A; clear ori_A;
+width = size(image, 2); height = size(image, 1); pixel_num = width * height;
+image = double(image);
+r = image(:,:,1); r = r(:);
+g = image(:,:,2); g = g(:);
+b = image(:,:,3); b = b(:);
+
+% construct first term matrix: local sparse
+fprintf('Construct local sparse matrix...\n');
+A = windowvar(image, window_size, param); A = alpha * A;
+
+% construct second term matrix: global sparse
+fprintf('Construct global sparse matrix...\n');
+B = spvar(image, splabel);
 B = beta * B;
+
+target = [r; g; b];
 
 fprintf('Calculate left hand matrix...\n');
 left_hand = lambda * (A' * A) + (B' * B) + ...
@@ -86,14 +83,19 @@ for i = 1 : itr_num
     d_2 = shrink(temp_2 + b_2, 1.0 / lambda);
     b_1 = b_1 + temp_1 - d_1;
     b_2 = b_2 + temp_2 - d_2;
-
-    % part_1 = sum(abs(temp_1)) / (alpha);
-    % part_2 = sum(abs(temp_2)) / (beta);
-    % part_3 = sum((ref-target).^2);
-    % total = alpha * part_1 + beta * part_2 + theta * part_3;
-
-    % fprintf('Iter %d, total: %f\n',i, total);
-    % fprintf('1: %f, 2: %f, 3: %f \n', part_1, part_2, part_3);
 end
 
 ref_image = reshape(ref, height, width, 3);
+ref_image = uint8(ref_image);
+end
+
+
+function d = shrink(v, lambda)
+index = find(v < 0);
+d = max(abs(v) - lambda, 0);
+d(index) = -1 * d(index);
+end
+
+
+
+

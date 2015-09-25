@@ -37,7 +37,7 @@ height = size(image, 1);
 width = size(image,2);
 pixel_num = height * width;
 
-est_pair_num = pixel_num * window_size * window_size;
+est_pair_num = pixel_num * (window_size+1) * (window_size+1);
 row = zeros(2*est_pair_num, 1);
 col = zeros(2*est_pair_num, 1);
 val = zeros(2*est_pair_num, 1);
