@@ -6,8 +6,6 @@ using namespace std;
 
 int main(int argc, char* argv[]){
     if (argc < 3){
-		// cout << "Usage: " << endl
-		//	<< "IntrinsicImage.exe [-i input_image_path] [-r region_file_path] [-m mask_file_path] [-o output_path]" << endl;
 		cout << "Usage: " << endl
 			<< "IntrinsicImage.exe [-i input_image_path] [-o output_path]" << endl;
         exit(-1);

@@ -7,6 +7,7 @@ function [ref_image] = l1smoothing(image, splabel, param)
 %   - param: parameters, alpha, beta, theta, lambda
 % Output:
 %   - ref_image: output image after smoothing
+
 width = size(image, 2);
 height = size(image, 1);
 pixel_num = width * height;
@@ -16,24 +17,15 @@ g = image(:,:,2); g = g(:);
 b = image(:,:,3); b = b(:);
 
 % construct first term matrix: local sparse
-fprintf('Construct matrix A...\n');
+fprintf('Construct local sparse matrix...\n');
 if ~exist('ori_A', 'var')
     window_size = 5;
     ori_A = windowvariation(image, window_size, param);
 end
 
 % construct second term matrix: global sparse
-fprintf('Construct matrix B...\n');
+fprintf('Construct global sparse matrix...\n');
 B = spvariation(image, splabel);
-
-% energy function: alpha * ||AR|| + beta * ||BR|| + theta * ||CR - r||_2 
-%                         + theta * ||DR - g||_2  + theta * ||ER - b||_2
-target_r = zeros(3*pixel_num, 1);
-target_r(1:pixel_num) = r;
-target_g = zeros(3*pixel_num, 1);
-target_g(pixel_num+1:2*pixel_num) = g;
-target_b = zeros(3*pixel_num,1); 
-target_b(2*pixel_num+1:end) = b;
 target = [r; g; b];
 
 % alpha = 20; beta = 0.01; theta = 50; lambda = 120;
@@ -56,7 +48,11 @@ else
     theta = 50;
 end
 
-lambda = 120;
+if isfield(param, 'lambda')
+    lambda = param.lambda;
+else
+    lambda = 120;
+end
 
 A = alpha * ori_A;
 B = beta * B;
@@ -65,7 +61,8 @@ fprintf('Calculate left hand matrix...\n');
 left_hand = lambda * (A' * A) + (B' * B) + ...
         theta * sparse(1:3*pixel_num, 1:3*pixel_num, ones(1,3*pixel_num));
 
-itr_num = 6; % origin: 4
+itr_num = 4; 
+
 ref = zeros(pixel_num*3,1);
 old_ref = target;
 threshold = 0.001;
@@ -74,6 +71,7 @@ d_1 = zeros(size(A,1),1);
 b_2 = zeros(size(B,1),1);
 d_2 = zeros(size(B,1),1);
 for i = 1 : itr_num
+    fprintf('Iteration %d out of %d...\n',i, itr_num);
     if(norm(ref - old_ref) < threshold)
         break;
     end 
@@ -81,9 +79,7 @@ for i = 1 : itr_num
 
     right_hand = theta * target + lambda * (A' * (d_1 - b_1) + B' * (d_2 - b_2));
 
-    fprintf('Solve linear system...\n');
     ref = left_hand \ right_hand;
-    fprintf('Finish solving...\n');
     temp_1 = A * ref;
     temp_2 = B * ref;
     d_1 = shrink(temp_1 + b_1, 1.0 / lambda);
