@@ -54,7 +54,7 @@ else
     lambda = 120;
 end
 
-A = alpha * ori_A;
+A = alpha * ori_A; clear ori_A;
 B = beta * B;
 
 fprintf('Calculate left hand matrix...\n');
