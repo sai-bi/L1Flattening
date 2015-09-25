@@ -8,6 +8,7 @@ function [M] = spvar(image, label)
 %   - label: super-pixel label for each pixel
 % Output:
 %   - M: generated matrix (sparse)
+
 image = double(image);
 width = size(image, 2); height = size(image, 1); pixel_num = height * width;
 
@@ -15,7 +16,6 @@ sp_num = length(unique(label));
 r = image(:,:,1); g = image(:,:,2); b = image(:,:,3);
 rep_index = zeros(sp_num, 1);
 
-% find the average color of each super-pixel
 for i = 1 : sp_num
     index = find(label == i);
     index_color = [r(index) g(index) b(index)];
@@ -28,15 +28,11 @@ end
 
 pair = nchoosek(rep_index, 2);
 temp_1 = pair(:,1)'; temp_2 = pair(:,2)'; pair_num = length(temp_1);
-row = [1:pair_num 1:pair_num];
-col = [temp_1 temp_2];
+row = [1:pair_num 1:pair_num]; col = [temp_1 temp_2];
 val = [ones(1, pair_num) -1 * ones(1,pair_num)];
 
-row_1 = row + length(row) / 2;
-col_1 = col + pixel_num;
-
-row_2 = row_1 + length(row) / 2;
-col_2 = col_1 + pixel_num;
+row_1 = row + length(row) / 2; col_1 = col + pixel_num;
+row_2 = row_1 + length(row) / 2; col_2 = col_1 + pixel_num;
 
 final_row = [row;row_1;row_2];
 final_col = [col;col_1;col_2];

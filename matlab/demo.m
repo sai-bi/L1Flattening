@@ -6,5 +6,8 @@ command = [sp_path ' -i ' image_path ' -o ' sp_output_path];
 system(command);
 splabel = csvread(sp_output_path);
 
-[ref_image] = l1smoothing(image, splabel, 0);
-imwrite(uint8(ref_image), '..\bin\53-flat.png');
+param = struct(); % use default parameters
+flat_image = l1flattening(image, splabel, param);
+imwrite(flat_image, '..\bin\53-flat.png');
+figure;
+imshow(flat_image);

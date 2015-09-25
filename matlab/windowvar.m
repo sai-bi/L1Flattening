@@ -12,31 +12,14 @@ function [M] = windowvar(image, window_size, param)
 % Ouput:
 % 	- M: generated matrix (sparse)
 
-if isfield(param, 'mu')
-	mu = param.mu;
-else
-	mu = 10.0;
-end
-
-if isfield(param, 'ga')
-	ga = param.ga;
-else
-	ga = 120.0;
-end
-
-if isfield(param, 'sigma')
-	sigma = param.sigma;
-else
-	sigma = 0.5;
-end
+param = getPrmDflt(param, {'mu', 10, 'ga', 120, 'sigma', 0.5});
+mu = param.mu; ga = param.ga; sigma = param.sigma;
 
 cform = makecform('srgb2lab');
 image_lab = applycform(uint8(image),cform);
 image_lab = double(image_lab);
 
-height = size(image, 1); 
-width = size(image,2);
-pixel_num = height * width;
+height = size(image, 1); width = size(image,2); pixel_num = height * width;
 
 chrom = image_lab(:,:,1) / 100.0 ;
 chrom_r = image_lab(:,:,2) / 220.0;
@@ -60,10 +43,8 @@ col = [pair_1 pair_2];
 val = [chrom(pair_1) - chrom(pair_2) ...
 	   chrom_r(pair_1) - chrom_r(pair_2) ...
 	   chrom_g(pair_1) - chrom_g(pair_2)];
-tic;
 val = sum(val.^2, 2);
 val = exp(-sigma * val);
-toc;
 val = [val -1.0 * val];
 
 row_1 = row + length(row) / 2; col_1 = col + pixel_num ;

@@ -1,22 +1,25 @@
 function [flat_image] = l1flattening(image, splabel, param)
-% [ref_image] = l1smoothing(image, splabel)
-% Usage: smoothing input image with L1 optimization
+% [ref_image] = l1flattening(image, splabel, param)
+% Usage: flat input image with L1 optimization
 % Input:
 %   - image: input image
-%   - splabel: super-pixel label for each pixel
-%   - param: parameters structure
+%   - splabel: super-pixel label for each pixel, same size with input image
+%   - param: parameters struct
 %       .alpha       [20] local sparseness weight
 %       .beta        [0.01] global sparseness weight
 %       .theta       [50] image approximation term
 %       .lambda      [120] regularization term weight
 %       .itr_num     [4] number of iterations in optimization
 %       .window_size [5] size of local sparseness windows
+%       .local_param struct, parameters for building local sparseness 
 % Output:
-%   - ref_image: output image after smoothing
+%   - flat_image: output image after flattening
 
-param = getPrmDflt(param, {'alpha',20,'beta',0.01,'theta',50,'lambda',120, 'itr_num', 4, 'window_size', 5});
+param = getPrmDflt(param, {'alpha',20,'beta',0.01,'theta',50,'lambda',120, ...
+    'itr_num', 4, 'window_size', 5, 'local_param', {}});
 alpha = param.alpha; beta = param.beta; theta = param.theta;
 lambda = param.lambda; itr_num = param.itr_num; window_size = param.window_size;
+local_param = param.local_param;
 
 width = size(image, 2); height = size(image, 1); pixel_num = width * height;
 image = double(image);
@@ -25,7 +28,7 @@ g = image(:,:,2); g = g(:);
 b = image(:,:,3); b = b(:);
 
 fprintf('Construct local sparse matrix...\n');
-A = windowvar(image, window_size, param); A = alpha * A;
+A = windowvar(image, window_size, local_param); A = alpha * A;
 fprintf('Construct global sparse matrix...\n');
 B = spvar(image, splabel);
 B = beta * B;
@@ -48,7 +51,6 @@ for i = 1 : itr_num
         break;
     end 
     old_ref = ref;
-
     right_hand = theta * target + lambda * (A' * (d_1 - b_1) + B' * (d_2 - b_2));
 
     ref = left_hand \ right_hand;
@@ -60,8 +62,8 @@ for i = 1 : itr_num
     b_2 = b_2 + temp_2 - d_2;
 end
 
-ref_image = reshape(ref, height, width, 3);
-ref_image = uint8(ref_image);
+flat_image = reshape(ref, height, width, 3);
+flat_image = uint8(flat_image);
 
 end
 
