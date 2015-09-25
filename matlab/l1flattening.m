@@ -1,10 +1,10 @@
-function [ref_image] = l1smoothing(image, splabel, param)
+function [flat_image] = l1flattening(image, splabel, param)
 % [ref_image] = l1smoothing(image, splabel)
 % Usage: smoothing input image with L1 optimization
 % Input:
 %   - image: input image
 %   - splabel: super-pixel label for each pixel
-%   - param:
+%   - param: parameters structure
 %       .alpha       [20] local sparseness weight
 %       .beta        [0.01] global sparseness weight
 %       .theta       [50] image approximation term
@@ -13,29 +13,10 @@ function [ref_image] = l1smoothing(image, splabel, param)
 %       .window_size [5] size of local sparseness windows
 % Output:
 %   - ref_image: output image after smoothing
-if isfield(param, 'alpha')
-    alpha = param.alpha;
-else
-    alpha = 20;
-end
 
-if isfield(param, 'beta')
-    beta = param.beta;
-else
-    beta = 0.01;
-end
-
-if isfield(param, 'theta')
-    theta = param.theta;
-else
-    theta = 50;
-end
-
-if isfield(param, 'lambda')
-    lambda = param.lambda;
-else
-    lambda = 120;
-end
+param = getPrmDflt(param, {'alpha',20,'beta',0.01,'theta',50,'lambda',120, 'itr_num', 4, 'window_size', 5});
+alpha = param.alpha; beta = param.beta; theta = param.theta;
+lambda = param.lambda; itr_num = param.itr_num; window_size = param.window_size;
 
 width = size(image, 2); height = size(image, 1); pixel_num = width * height;
 image = double(image);
@@ -43,22 +24,16 @@ r = image(:,:,1); r = r(:);
 g = image(:,:,2); g = g(:);
 b = image(:,:,3); b = b(:);
 
-% construct first term matrix: local sparse
 fprintf('Construct local sparse matrix...\n');
 A = windowvar(image, window_size, param); A = alpha * A;
-
-% construct second term matrix: global sparse
 fprintf('Construct global sparse matrix...\n');
 B = spvar(image, splabel);
 B = beta * B;
-
 target = [r; g; b];
 
 fprintf('Calculate left hand matrix...\n');
 left_hand = lambda * (A' * A) + (B' * B) + ...
         theta * sparse(1:3*pixel_num, 1:3*pixel_num, ones(1,3*pixel_num));
-
-itr_num = 4; 
 
 ref = zeros(pixel_num*3,1);
 old_ref = target;
@@ -87,6 +62,7 @@ end
 
 ref_image = reshape(ref, height, width, 3);
 ref_image = uint8(ref_image);
+
 end
 
 
