@@ -1,7 +1,7 @@
 #L1 image flattening
 
-<img src = "../data/1.png"/ width="45%">
-<img src = "../data/1-flat.png" width = "45%"/>
+<img src = "./data/1.png"/ width="45%">
+<img src = "./data/1-flat.png" width = "45%"/>
 
 This is the code for our 2015 SIGGRAPH paper *An L1 Image Transform for Edge-Preserving Smoothing and Scene-Level Intrinsic Decomposition*. If you use this code, please cite our paper.
 
