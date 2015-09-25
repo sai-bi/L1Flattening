@@ -1,9 +1,13 @@
 #L1 image flattening
 
+<img src = "../data/1.png"/ width="45%">
+<img src = "../data/1-flat.png" width = "45%"/>
+
 This is the code for our 2015 SIGGRAPH paper *An L1 Image Transform for Edge-Preserving Smoothing and Scene-Level Intrinsic Decomposition*. If you use this code, please cite our paper.
 
 Please note that this implementation may not necessarily follow exactly what the paper describes. Given the 
 size of energy function to be optimized, it may require 4 GB memory or more. In addition, to generate super-pixels, I have made use of an external program. For details, please see `demo.m`.
+
 
 # Citation
 	@article{L1Intrinsic,  
