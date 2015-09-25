@@ -10,9 +10,10 @@ SpMat& BuildWindowVariationMatrix(const cv::Mat_<cv::Vec3b>& image,
 	double ga = 120;
 	double sigma = 0.5;
 
-	Mat_<Vec3d> lab_image;
-	cvtColor(image, lab_image, cv::COLOR_BGR2Lab);
-	lab_image = 1.0 / 255 * lab_image;
+	Mat_<Vec3b> temp;
+	cvtColor(image, temp, cv::COLOR_BGR2Lab);
+	Mat_<Vec3d> lab_image = temp.clone();
+	lab_image = 1.0 / 255.0 * lab_image;
 
 	int height = image.rows;
 	int width = image.cols;
@@ -22,6 +23,7 @@ SpMat& BuildWindowVariationMatrix(const cv::Mat_<cv::Vec3b>& image,
 	int pixel_num = height * width;
 	for (int i = 0; i < width; i++){
 		for (int j = 0; j < height; j++){
+			cout << i << " " << j << endl;
 			for (int p = 0; p < i + window_size && p < width; p++){
 				for (int q = 0; q < j + window_size && q < height; q++){
 					if (i == p && j == q){

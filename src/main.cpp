@@ -1,8 +1,17 @@
 #include <fstream>
-#include "get-cluster.h"
+#include "flattening.h"
 using namespace cv;
 using namespace std;
 
+
+int main(){
+	Mat_<Vec3b> image = imread("C:\\Users\\bisai\\Documents\\research\\dataset\\l1flttening\\19.png");
+	imshow("test", image);
+	waitKey(0);
+	BuildWindowVariationMatrix(image, 5);
+	return 0;
+}
+/*
 int main(int argc, char* argv[]){
     if (argc < 3){
         cout << "Usage: " << endl
@@ -85,3 +94,4 @@ int main(int argc, char* argv[]){
 	
     return 0;
 }
+*/
