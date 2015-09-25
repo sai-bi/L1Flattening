@@ -1,21 +1,15 @@
 #include <fstream>
-#include "flattening.h"
+#include "get-cluster.h"
 using namespace cv;
 using namespace std;
 
 
-int main(){
-	Mat_<Vec3b> image = imread("C:\\Users\\bisai\\Documents\\research\\dataset\\l1flttening\\19.png");
-	imshow("test", image);
-	waitKey(0);
-	BuildWindowVariationMatrix(image, 5);
-	return 0;
-}
-/*
 int main(int argc, char* argv[]){
     if (argc < 3){
-        cout << "Usage: " << endl
-            << "IntrinsicImage.exe [-i input_image_path] [-r region_file_path] [-m mask_file_path] [-o output_path]" << endl;
+		// cout << "Usage: " << endl
+		//	<< "IntrinsicImage.exe [-i input_image_path] [-r region_file_path] [-m mask_file_path] [-o output_path]" << endl;
+		cout << "Usage: " << endl
+			<< "IntrinsicImage.exe [-i input_image_path] [-o output_path]" << endl;
         exit(-1);
     }
     string image_path; 
@@ -94,4 +88,3 @@ int main(int argc, char* argv[]){
 	
     return 0;
 }
-*/
