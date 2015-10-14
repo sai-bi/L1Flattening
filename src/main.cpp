@@ -36,9 +36,9 @@ int main(int argc, char* argv[]){
     int image_width = image.cols;
     int image_height = image.rows;
     Mat_<Vec3b> lab_image(image_height, image_width);    
-    Mat_<int> region(image_height, image_width, 1);
-    int expected_cluster_num = 500;
-    Mat_<int> mask(image_height, image_width, 1);
+    Mat_<int> region(image_height, image_width, 1); // not used now
+    int expected_cluster_num = 500; 
+    Mat_<int> mask(image_height, image_width, 1); // not used now
 
     // transform into lab color space
     cvtColor(image, lab_image, CV_BGR2Lab);
