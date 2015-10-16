@@ -2,12 +2,12 @@
 <img src = "./data/1.png"/ width="45%">
 <img src = "./data/1-flat.png" width = "45%"/>
 
-original image | flattening
+original | flattening
 ---
 <img src = "./data/2.png"/ width="30%">
 <img src = "./data/2-flat.png"/ width="30%">
 <img src = "./data/2-smooth.png"/ width="30%">
-original image | flattening | edge-preserving smoothing
+original | flattening | edge-preserving smoothing
 ---
 This is the code for our 2015 SIGGRAPH paper *An L1 Image Transform for Edge-Preserving Smoothing and Scene-Level Intrinsic Decomposition*. If you use this code, please cite our paper.
 
