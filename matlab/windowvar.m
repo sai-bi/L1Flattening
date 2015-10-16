@@ -1,4 +1,4 @@
-function [M] = windowvar(image, window_size, param)
+function [M] = windowvar(image, param)
 % [M] = windowvariation(image, window_size)
 % Usage: generate a matrix used to get the total varation for each pixel 
 %	in a window centered at it.
@@ -9,11 +9,16 @@ function [M] = windowvar(image, window_size, param)
 %	  	.mu 		[10] lightness weight in Lab color space
 %	  	.ga 		[120] color-opponent weight in Lab color space
 %	  	.sigma 		[0.5] lightness weight
+%		.window_size [5] window size of local smoothing matrix
+%		.edge_preserving [false] whether to perform edge preserving or not
+%		.eta		[15] weight for maximum gradient
 % Ouput:
 % 	- M: generated matrix (sparse)
 
-param = getPrmDflt(param, {'mu', 10, 'ga', 120, 'sigma', 0.5});
-mu = param.mu; ga = param.ga; sigma = param.sigma;
+param = getPrmDflt(param, {'mu', 10, 'ga', 120, 'sigma', 0.5, 'window_size', 5, ...
+			'edge_preserving', false, 'eta', 15});
+mu = param.mu; ga = param.ga; sigma = param.sigma; edge_preserving = param.edge_preserving;
+eta = param.eta; window_size = param.window_size;
 
 cform = makecform('srgb2lab');
 image_lab = applycform(uint8(image),cform);
@@ -25,7 +30,7 @@ chrom = image_lab(:,:,1) / 100.0 ;
 chrom_r = image_lab(:,:,2) / 220.0;
 chrom_g = image_lab(:,:,3) / 220.0;
 
-chrom = mu * chrom; chrom = chrom(:); % 10: best 
+chrom = mu * chrom; chrom = chrom(:); 
 chrom_r = ga * chrom_r; chrom_r = chrom_r(:);
 chrom_g = ga * chrom_g; chrom_g = chrom_g(:);
 
@@ -44,6 +49,13 @@ val = [chrom(pair_1) - chrom(pair_2) ...
 	   chrom_r(pair_1) - chrom_r(pair_2) ...
 	   chrom_g(pair_1) - chrom_g(pair_2)];
 val = sum(val.^2, 2);
+if edge_preserving == true
+	grad = sobelgrad(image);
+	grad_val = wingrad(grad, pair_1 - 1, pair_2 - 1);
+	grad_val = grad_val * eta;
+	val = max([grad_val val], [], 2);
+end
+
 val = exp(-sigma * val);
 val = [val -1.0 * val];
 
@@ -66,5 +78,15 @@ x = x(:); y = y(:);
 id = (y-1) * height + x;
 id = id(2:end); 
 win = [index * ones(length(id),1) id];
+end
+
+function [g] = sobelgrad(image)
+image = double(image);
+image = image / 255.0;
+h = fspecial('sobel');
+g1 = imfilter(image,h); g2 = imfilter(image,h');
+g1 = double(g1); g2 = double(g2);
+g1 = mean(g1, 3); g2 = mean(g2,3);
+g = sqrt(g1.^2 + g2.^2);
 end
 

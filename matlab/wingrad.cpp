@@ -14,7 +14,6 @@ inline void swap(float& x1, float& x2){
 
 double MaxGrad(float x1, float y1, float x2, float y2, double* grad_matrix, int h, int w)
 {
-        // Bresenham's line algorithm
   const bool steep = (fabs(y2 - y1) > fabs(x2 - x1));
   double max_grad = -1e7;
   if(steep)
@@ -42,13 +41,11 @@ double MaxGrad(float x1, float y1, float x2, float y2, double* grad_matrix, int 
   {
     if(steep)
     {
-        // SetPixel(y,x, color);
         float grad = grad_matrix[sub_to_index(y, x, h)];
         max_grad = max_grad > fabs(grad) ? max_grad : fabs(grad);
     }
     else
     {
-        // SetPixel(x,y, color);
         float grad = grad_matrix[sub_to_index(x,y,h)];
         max_grad = max_grad > fabs(grad) ? max_grad : fabs(grad);
     }

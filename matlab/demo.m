@@ -6,8 +6,12 @@ command = [sp_path ' -i ' image_path ' -o ' sp_output_path];
 system(command);
 splabel = csvread(sp_output_path);
 
-param = struct(); % use default parameters
+% use default parameters for image flattening
+param = struct(); 
 flat_image = l1flattening(image, splabel, param);
 imwrite(flat_image, '..\data\2-flat.png');
-figure;
-imshow(flat_image);
+
+% use default parameters for edge-preserving smoothing
+param.local_param.edge_preserving = true; 
+flat_image = l1flattening(image, splabel, param);
+imwrite(flat_image, '..\data\2-smooth.png');
