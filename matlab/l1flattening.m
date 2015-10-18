@@ -1,9 +1,8 @@
-function [flat_image] = l1flattening(image, splabel, param)
+function [flat_image] = l1flattening(image, param)
 % [ref_image] = l1flattening(image, splabel, param)
 % Usage: flat input image with L1 optimization
 % Input:
 %   - image: input image
-%   - splabel: super-pixel label for each pixel
 %   - param: parameters struct
 %       .alpha       [20] local sparseness weight
 %       .beta        [0.01] global sparseness weight
@@ -28,7 +27,13 @@ b = image(:,:,3); b = b(:);
 
 fprintf('Construct local sparse matrix...\n');
 A = windowvar(image, local_param); A = alpha * A;
+
 fprintf('Construct global sparse matrix...\n');
+cform = makecform('srgb2lab');
+image_lab = applycform(uint8(image),cform);
+image_lab = double(image_lab);
+image_lab(:,:,1) = 0.03 * image_lab(:,:,1);
+splabel = seg(image_lab, 0.5, 5, 500); 
 B = spvar(image, splabel);
 B = beta * B;
 target = [r; g; b];
