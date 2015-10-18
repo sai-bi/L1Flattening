@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #include <algorithm>
 #include <cmath>
 #include "disjoint-set.h"
-#include <opencv2/opencv.hpp>
-using namespace cv;
+// #include <opencv2/opencv.hpp>
+// using namespace cv;
 // threshold function
 #define THRESHOLD(size, c) (c/size)
 // a, b: the vertices connected by this edge
@@ -46,21 +46,19 @@ bool operator<(const edge &a, const edge &b) {
 * b: label for second cluster
 * max_pixel_num: maximum number of pixels in a cluster
 */
-bool AllowMerge(const universe& u, int a, int b, int max_pixel_num, const Mat_<int>& region){
+bool AllowMerge(const universe& u, int a, int b, int max_pixel_num, image<int>* region){
     int size_a = u.size(a);
     int size_b = u.size(b);
-    int width = region.cols;
+    int width = region->width();
     if (size_a + size_b > max_pixel_num) {
         return false;
     }
 
-    
-    
-    int x_a = a / width;
-    int y_a = a % width;
-    int x_b = b / width;
-    int y_b = b % width;
-    if (region(x_a, y_a) != region(x_b, y_b)){
+    int y_a = a / width;
+    int x_a = a % width;
+    int y_b = b / width;
+    int x_b = b % width;
+    if (region->access[y_a][x_a] != region->access[y_b][x_b]){
         return false;
     }
     
@@ -79,7 +77,7 @@ bool AllowMerge(const universe& u, int a, int b, int max_pixel_num, const Mat_<i
 * max_pixel_num: maximum number of pixels in a cluster
 */
 universe *segment_graph(int num_vertices, int num_edges, edge *edges,
-    float c, int max_pixel_num, const Mat_<int>& region) {
+    float c, int max_pixel_num, image<int>* region) {
     // sort edges by weight
     std::sort(edges, edges + num_edges);
 
