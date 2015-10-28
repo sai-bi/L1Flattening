@@ -20,22 +20,16 @@ param = getPrmDflt(param, {'mu', 10, 'ga', 120, 'sigma', 0.5, 'window_size', 5, 
 mu = param.mu; ga = param.ga; sigma = param.sigma; edge_preserving = param.edge_preserving;
 eta = param.eta; window_size = param.window_size;
 
-cform = makecform('srgb2lab');
-image_lab = applycform(uint8(image),cform);
-image_lab = double(image_lab);
+cform = makecform('srgb2lab'); image_lab = applycform(uint8(image),cform); image_lab = double(image_lab);
 
 height = size(image, 1); width = size(image,2); pixel_num = height * width;
 
-chrom = image_lab(:,:,1) / 100.0 ;
-chrom_r = image_lab(:,:,2) / 220.0;
-chrom_g = image_lab(:,:,3) / 220.0;
+chrom = image_lab(:,:,1) / 100.0 ; chrom_r = image_lab(:,:,2) / 220.0; chrom_g = image_lab(:,:,3) / 220.0;
 
-chrom = mu * chrom; chrom = chrom(:); 
-chrom_r = ga * chrom_r; chrom_r = chrom_r(:);
+chrom = mu * chrom; chrom = chrom(:);  chrom_r = ga * chrom_r; chrom_r = chrom_r(:);
 chrom_g = ga * chrom_g; chrom_g = chrom_g(:);
 
-arr = 1:pixel_num;
-f = @window;
+arr = 1:pixel_num; f = @window;
 temp_1 = repmat(window_size, 1, pixel_num); temp_2 = repmat(height, 1, pixel_num);
 temp_3 = repmat(width, 1, pixel_num);
 all_pair = arrayfun(f, arr, temp_1, temp_2, temp_3, 'UniformOutput', 0);
@@ -61,9 +55,7 @@ val = [val -1.0 * val];
 
 row_1 = row + length(row) / 2; col_1 = col + pixel_num ;
 row_2 = row_1 + length(row) / 2; col_2 = col_1 + pixel_num;
-final_row = [row row_1 row_2];
-final_col = [col col_1 col_2];
-final_val = [val val val];
+final_row = [row row_1 row_2]; final_col = [col col_1 col_2]; final_val = [val val val];
 M = sparse(final_row, final_col, final_val);
 
 end
