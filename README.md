@@ -15,6 +15,8 @@ Please note that this implementation may not necessarily follow exactly what the
 
 If you need to rebuild the source files under 'src/', please run `mex -I.\ segment.cpp`.
 
+If you have any question, please contact me at `soundsilencebisai-at-gmail-dot-com`.
+
 
 # Citation
 	@article{L1Intrinsic,  
